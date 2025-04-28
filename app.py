@@ -11,6 +11,7 @@ from flask import send_file
 
 import google.generativeai as genai
 from flask import request, jsonify
+from dotenv import load_dotenv
 
 # Import from our modules
 from tts import generate_simple_tts
@@ -19,11 +20,12 @@ from tts import generate_simple_tts
 app = Flask(__name__)
 app.secret_key = "simple_tts_generator"  # for session management
 
+load_dotenv()
+
 def setup_gemini_api(api_key):
     genai.configure(api_key=api_key)
 # Add this to your app initialization
-app.config['GEMINI_API_KEY'] = "AIzaSyCFS-xORFSlZgvpjMRIfcu1LoRG24tv3ks"  # Better to use environment variable
-
+app.config['GEMINI_API_KEY'] = os.getenv("GEMINI_API_KEY")
 # Configure upload folder
 UPLOAD_FOLDER = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'uploads')
 OUTPUT_FOLDER = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'outputs')
