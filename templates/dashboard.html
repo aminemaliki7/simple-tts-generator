@@ -3,57 +3,417 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My Jobs - Simple TTS Generator</title>
+    <title>My Jobs - Voice Generator</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.1/css/all.min.css">
     <style>
+        :root {
+            --primary: #0068FF;
+            --primary-dark: #0050C0;
+            --secondary: #4D4D4D;
+            --tertiary: #808080;
+            --dark: #000000;
+            --light: #FFFFFF;
+            --gray: #F5F5F7;
+            --gray-dark: #86868b;
+            --success: #2fd471;
+            --warning: #ff9d00;
+            --danger: #ff453a;
+            --info: #5ac8fa;
+            --background: #000000;
+            --card-bg: #0D0D0D;
+            --input-bg: #1C1C1E;
+            --border-color: #333333;
+        }
+        
         body {
-            padding-top: 2rem;
-            padding-bottom: 2rem;
+            font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            background-color: var(--background);
+            color: var(--light);
+            padding: 0;
+            margin: 0;
         }
-        .dashboard-container {
-            max-width: 900px;
+        
+        .gradient-bg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 300px;
+            background: linear-gradient(180deg, rgba(30,30,30,1) 0%, rgba(0,0,0,1) 100%);
+            z-index: -1;
+        }
+        
+        .app-container {
+            max-width: 1000px;
             margin: 0 auto;
-            padding: 2rem;
-            border-radius: 10px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-            background-color: #fff;
+            padding: 2rem 1rem;
         }
-        .header {
-            text-align: center;
+        
+        .card {
+            background-color: var(--card-bg);
+            border-radius: 16px;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+            padding: 2rem;
             margin-bottom: 2rem;
         }
-        .status-badge {
-            font-size: 0.85rem;
-            padding: 0.35rem 0.65rem;
+        
+        .header {
+            color: var(--light);
+            margin-bottom: 1.5rem;
+            text-align: center;
+            padding: 1rem 0 2rem;
         }
+        
+        .header h1 {
+            font-weight: 600;
+            font-size: 2.4rem;
+            margin-bottom: 0.5rem;
+            letter-spacing: -0.015em;
+        }
+        
+        .header p {
+            font-weight: 400;
+            font-size: 1.1rem;
+            opacity: 0.7;
+            letter-spacing: -0.01em;
+        }
+        
+        .section-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: var(--light);
+            letter-spacing: -0.01em;
+        }
+        
+        .btn-primary {
+            background-color: var(--primary);
+            border: none;
+            border-radius: 20px;
+            padding: 0.85rem 1.75rem;
+            font-weight: 500;
+            transition: all 0.2s ease;
+            letter-spacing: -0.01em;
+        }
+        
+        .btn-primary:hover {
+            background-color: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 104, 255, 0.3);
+        }
+        
+        .btn-outline-primary {
+            color: var(--primary);
+            background-color: rgba(0, 104, 255, 0.1);
+            border: none;
+            border-radius: 20px;
+            padding: 0.5rem 1rem;
+            transition: all 0.2s ease;
+        }
+        
+        .btn-outline-primary:hover {
+            background-color: rgba(0, 104, 255, 0.2);
+            color: var(--light);
+        }
+        
+        .btn-outline-success {
+            color: var(--success);
+            background-color: rgba(47, 212, 113, 0.1);
+            border: none;
+            border-radius: 20px;
+            padding: 0.5rem 1rem;
+            transition: all 0.2s ease;
+        }
+        
+        .btn-outline-success:hover {
+            background-color: rgba(47, 212, 113, 0.2);
+            color: var(--light);
+        }
+        
+        .btn-outline-secondary {
+            color: var(--light);
+            background-color: rgba(255, 255, 255, 0.08);
+            border: none; 
+            border-radius: 20px;
+            padding: 0.5rem 1rem;
+            transition: all 0.2s ease;
+        }
+        
+        .btn-outline-secondary:hover {
+            background-color: rgba(255, 255, 255, 0.15);
+            color: var(--light);
+        }
+        
+        .btn-outline-info {
+            color: var(--info);
+            background-color: rgba(90, 200, 250, 0.1);
+            border: none;
+            border-radius: 20px;
+            padding: 0.5rem 1rem;
+            transition: all 0.2s ease;
+        }
+        
+        .btn-outline-info:hover {
+            background-color: rgba(90, 200, 250, 0.2);
+            color: var(--light);
+        }
+        
+        .icon-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .status-badge {
+            font-size: 0.8rem;
+            padding: 0.35rem 0.65rem;
+            border-radius: 20px;
+            font-weight: 600;
+        }
+        
+        .badge-pending {
+            background-color: rgba(255, 157, 0, 0.2);
+            color: var(--warning);
+        }
+        
+        .badge-processing {
+            background-color: rgba(90, 200, 250, 0.2);
+            color: var(--info);
+        }
+        
+        .badge-completed {
+            background-color: rgba(47, 212, 113, 0.2);
+            color: var(--success);
+        }
+        
+        .badge-failed {
+            background-color: rgba(255, 69, 58, 0.2);
+            color: var(--danger);
+        }
+        
+        .table {
+            color: var(--light);
+            margin-bottom: 0;
+        }
+        
+        .table thead th {
+            background-color: rgba(255, 255, 255, 0.05);
+            color: var(--gray-dark);
+            font-weight: 500;
+            border-bottom: 1px solid var(--border-color);
+            padding: 1rem;
+        }
+        
+        .table tbody td {
+            border-color: var(--border-color);
+            padding: 1rem;
+            vertical-align: middle;
+        }
+        
+        .table tbody tr:hover {
+            background-color: rgba(255, 255, 255, 0.03);
+        }
+        
         .empty-state {
             text-align: center;
-            padding: 3rem 1rem;
-            color: #6c757d;
+            padding: 4rem 1rem;
+            color: var(--gray-dark);
+            background-color: var(--input-bg);
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+            margin-bottom: 2rem;
         }
-        .empty-state svg {
-            width: 4rem;
-            height: 4rem;
+        
+        .empty-state-icon {
+            font-size: 3rem;
+            margin-bottom: 1.5rem;
+            color: var(--primary);
+            opacity: 0.5;
+        }
+        
+        .empty-state h4 {
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: var(--light);
+        }
+        
+        .empty-state p {
+            margin-bottom: 1.5rem;
+            opacity: 0.7;
+        }
+        
+        .table-responsive {
+            border-radius: 12px;
+            overflow: hidden;
+            border: 1px solid var(--border-color);
+            margin-bottom: 2rem;
+        }
+        
+        .script-name {
+            max-width: 200px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        
+        .voice-name {
+            max-width: 200px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 0.5rem;
+        }
+        
+        .footer {
+            text-align: center;
+            color: var(--gray-dark);
+            font-size: 0.9rem;
+            margin-top: 2rem;
+            opacity: 0.7;
+        }
+        
+        /* Audio player modal styles */
+        .audio-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.85);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+        
+        .audio-modal.show {
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        .audio-container {
+            background-color: var(--card-bg);
+            border-radius: 16px;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 25px 50px rgba(0,0,0,0.3);
+            padding: 2rem;
+            width: 90%;
+            max-width: 500px;
+            position: relative;
+        }
+        
+        .close-modal {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: transparent;
+            border: none;
+            color: var(--gray-dark);
+            font-size: 1.5rem;
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+        
+        .close-modal:hover {
+            color: var(--light);
+        }
+        
+        .audio-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            color: var(--light);
+            padding-right: 2rem;
+        }
+        
+        .audio-player {
+            width: 100%;
             margin-bottom: 1rem;
-            color: #adb5bd;
+        }
+        
+        .audio-player-controls {
+            width: 100%;
+            margin-top: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .audio-player-control-btn {
+            width: 3rem;
+            height: 3rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .audio-player-control-btn:hover {
+            background-color: var(--primary-dark);
+            transform: scale(1.05);
+        }
+        
+        .audio-timeline {
+            flex-grow: 1;
+            background-color: var(--input-bg);
+            height: 8px;
+            border-radius: 4px;
+            position: relative;
+            cursor: pointer;
+            overflow: hidden;
+        }
+        
+        .audio-progress {
+            background-color: var(--primary);
+            height: 100%;
+            width: 0%;
+            transition: width 0.1s linear;
+        }
+        
+        .audio-time {
+            color: var(--gray-dark);
+            font-size: 0.8rem;
+            margin-left: 0.5rem;
+            user-select: none;
         }
     </style>
 </head>
-<body class="bg-light">
-    <div class="container">
-        <div class="dashboard-container">
-            <div class="header">
-                <h1>My Jobs</h1>
-                <p class="lead">Manage your TTS generation jobs</p>
-            </div>
-            
+<body>
+    <div class="gradient-bg"></div>
+    <div class="app-container">
+        <div class="header">
+            <h1>My Jobs</h1>
+            <p>Manage your voice generation history</p>
+        </div>
+        
+        <div class="card">
             {% if jobs %}
+            <h4 class="section-title mb-3">
+                <i class="fas fa-history me-2" style="color: var(--primary);"></i>
+                Recent Jobs
+            </h4>
+            
             <div class="table-responsive">
-                <table class="table table-hover">
+                <table class="table">
                     <thead>
                         <tr>
-                            <th>Job ID</th>
                             <th>Script</th>
+                            <th>Voice</th>
                             <th>Status</th>
                             <th>Created</th>
                             <th>Actions</th>
@@ -62,31 +422,48 @@
                     <tbody>
                         {% for job_id, job in jobs.items() %}
                         <tr>
-                            <td><small class="text-muted">{{ job_id[:8] }}...</small></td>
-                            <td>{{ job.script_file.split('/')[-1] }}</td>
+                            <td>
+                                <div class="script-name">
+                                    {{ job.script_file.split('/')[-1].split('\\')[-1] }}
+                                </div>
+                            </td>
+                            <td>
+                                <div class="voice-name">
+                                    {% set voice_id = job.voice_id %}
+                                    {% for voice in voices %}
+                                        {% if voice.id == voice_id %}
+                                            {{ voice.name }}
+                                        {% endif %}
+                                    {% endfor %}
+                                </div>
+                            </td>
                             <td>
                                 {% if job.status == 'pending' %}
-                                <span class="badge bg-warning text-dark status-badge">Pending</span>
+                                <span class="status-badge badge-pending">Pending</span>
                                 {% elif job.status == 'processing' %}
-                                <span class="badge bg-info text-dark status-badge">Processing</span>
+                                <span class="status-badge badge-processing">Processing</span>
                                 {% elif job.status == 'completed' %}
-                                <span class="badge bg-success status-badge">Completed</span>
+                                <span class="status-badge badge-completed">Completed</span>
                                 {% elif job.status == 'failed' %}
-                                <span class="badge bg-danger status-badge">Failed</span>
+                                <span class="status-badge badge-failed">Failed</span>
                                 {% endif %}
                             </td>
                             <td>
                                 <small class="text-muted">{{ job.start_time|int|strftime }}</small>
                             </td>
                             <td>
-                                <a href="{{ url_for('job_status', job_id=job_id) }}" class="btn btn-sm btn-outline-primary">
-                                    View
-                                </a>
-                                {% if job.status == 'completed' %}
-                                <a href="{{ url_for('download_file', job_id=job_id) }}" class="btn btn-sm btn-outline-success">
-                                    Download
-                                </a>
-                                {% endif %}
+                                <div class="action-buttons">
+                                    {% if job.status == 'completed' %}
+                                    <button class="btn btn-sm btn-outline-info icon-btn preview-audio" data-job-id="{{ job_id }}">
+                                        <i class="fas fa-play"></i>
+                                        Play
+                                    </button>
+                                    <a href="{{ url_for('download_file', job_id=job_id) }}" class="btn btn-sm btn-outline-success icon-btn">
+                                        <i class="fas fa-download"></i>
+                                        Download
+                                    </a>
+                                    {% endif %}
+                                </div>
                             </td>
                         </tr>
                         {% endfor %}
@@ -95,21 +472,167 @@
             </div>
             {% else %}
             <div class="empty-state">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4" />
-                </svg>
+                <div class="empty-state-icon">
+                    <i class="fas fa-folder-open"></i>
+                </div>
                 <h4>No Jobs Found</h4>
-                <p>You haven't created any TTS jobs yet.</p>
-                <a href="/" class="btn btn-primary">Create Your First Job</a>
+                <p>You haven't created any voice generation jobs yet.</p>
+                <a href="/" class="btn btn-primary icon-btn">
+                    <i class="fas fa-plus me-2"></i>
+                    Create Your First Job
+                </a>
             </div>
             {% endif %}
             
-            <div class="mt-4 text-center">
-                <a href="/" class="btn btn-primary">Create New Job</a>
+            <div class="d-flex justify-content-center mt-4">
+                <a href="/" class="btn btn-primary icon-btn">
+                    <i class="fas fa-plus"></i>
+                    Create New Job
+                </a>
+            </div>
+        </div>
+        
+        <div class="footer">
+            <p>Create natural-sounding voice content with our advanced AI voice generation technology.</p>
+            <p>&copy; 2025 Voice Generator. All rights reserved.</p>
+        </div>
+    </div>
+    
+    <!-- Audio Player Modal -->
+    <div class="audio-modal" id="audioModal">
+        <div class="audio-container">
+            <button class="close-modal" id="closeModal">
+                <i class="fas fa-times"></i>
+            </button>
+            <h4 class="audio-title" id="audioTitle">Preview Audio</h4>
+            
+            <div class="custom-audio-player">
+                <audio id="audioPlayer" preload="metadata"></audio>
+                
+                <div class="audio-player-controls">
+                    <button class="audio-player-control-btn" id="playPauseBtn">
+                        <i class="fas fa-play" id="playIcon"></i>
+                    </button>
+                    <div class="audio-timeline" id="audioTimeline">
+                        <div class="audio-progress" id="audioProgress"></div>
+                    </div>
+                    <span class="audio-time" id="audioTime">0:00 / 0:00</span>
+                </div>
             </div>
         </div>
     </div>
     
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Elements
+            const audioModal = document.getElementById('audioModal');
+            const closeModal = document.getElementById('closeModal');
+            const audioPlayer = document.getElementById('audioPlayer');
+            const audioTitle = document.getElementById('audioTitle');
+            const playPauseBtn = document.getElementById('playPauseBtn');
+            const playIcon = document.getElementById('playIcon');
+            const audioTimeline = document.getElementById('audioTimeline');
+            const audioProgress = document.getElementById('audioProgress');
+            const audioTime = document.getElementById('audioTime');
+            
+            // Preview audio buttons
+            const previewButtons = document.querySelectorAll('.preview-audio');
+            
+            // Format time function
+            function formatTime(seconds) {
+                const minutes = Math.floor(seconds / 60);
+                const remainingSeconds = Math.floor(seconds % 60);
+                return `${minutes}:${remainingSeconds < 10 ? '0' : ''}${remainingSeconds}`;
+            }
+            
+            // Update progress bar
+            function updateProgress() {
+                const percent = (audioPlayer.currentTime / audioPlayer.duration) * 100;
+                audioProgress.style.width = `${percent}%`;
+                audioTime.textContent = `${formatTime(audioPlayer.currentTime)} / ${formatTime(audioPlayer.duration)}`;
+            }
+            
+            // Event listener for preview buttons
+            previewButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const jobId = this.getAttribute('data-job-id');
+                    const scriptName = this.closest('tr').querySelector('.script-name').textContent.trim();
+                    const voiceName = this.closest('tr').querySelector('.voice-name').textContent.trim();
+                    
+                    // Set audio source and title
+                    audioPlayer.src = `/stream-audio/${jobId}`;
+                    audioTitle.textContent = `Preview: ${scriptName} (${voiceName})`;
+                    
+                    // Reset player state
+                    audioProgress.style.width = '0%';
+                    playIcon.className = 'fas fa-play';
+                    
+                    // Show modal
+                    audioModal.classList.add('show');
+                    
+                    // Load audio
+                    audioPlayer.load();
+                });
+            });
+            
+            // Close modal
+            closeModal.addEventListener('click', function() {
+                audioModal.classList.remove('show');
+                audioPlayer.pause();
+            });
+            
+            // Click outside to close
+            audioModal.addEventListener('click', function(e) {
+                if (e.target === audioModal) {
+                    audioModal.classList.remove('show');
+                    audioPlayer.pause();
+                }
+            });
+            
+            // Play/Pause button
+            playPauseBtn.addEventListener('click', function() {
+                if (audioPlayer.paused) {
+                    audioPlayer.play();
+                    playIcon.className = 'fas fa-pause';
+                } else {
+                    audioPlayer.pause();
+                    playIcon.className = 'fas fa-play';
+                }
+            });
+            
+            // Timeline click
+            audioTimeline.addEventListener('click', function(e) {
+                const timelineWidth = this.clientWidth;
+                const clickPosition = e.offsetX;
+                const clickPercent = (clickPosition / timelineWidth);
+                audioPlayer.currentTime = clickPercent * audioPlayer.duration;
+            });
+            
+            // Audio player events
+            audioPlayer.addEventListener('timeupdate', updateProgress);
+            
+            audioPlayer.addEventListener('play', function() {
+                playIcon.className = 'fas fa-pause';
+            });
+            
+            audioPlayer.addEventListener('pause', function() {
+                playIcon.className = 'fas fa-play';
+            });
+            
+            audioPlayer.addEventListener('ended', function() {
+                playIcon.className = 'fas fa-play';
+                audioProgress.style.width = '0%';
+                audioPlayer.currentTime = 0;
+            });
+            
+            // Duration change event for initial time display
+            audioPlayer.addEventListener('durationchange', function() {
+                if (!isNaN(audioPlayer.duration)) {
+                    audioTime.textContent = `0:00 / ${formatTime(audioPlayer.duration)}`;
+                }
+            });
+        });
+    </script>
 </body>
 </html>
