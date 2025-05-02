@@ -1,5 +1,86 @@
+# Python cache files
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Virtual environment
+venv/
+ENV/
+env/
+
+# Media and data files
+downloads/
+uploads/
+outputs/
+youtube audio/
+pinterest_videos/
+media/
+*.mp3
+*.mp4
+*.wav
+*.aac
+*.ogg
+*.flac
+
+# Databases
+*.db
+*.sqlite
+*.sqlite3
+
+# Excel files
+*.xlsx
+*.xls
+*.csv
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# IDE and editor files
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+
+# Local configuration
 .env
-.vercel
-.vercelignore
-vercel.json
+.env.*
+*.env
+config.ini
+local_settings.py
+
+# Logs
+logs/
 *.log
+npm-debug.log*
+
+# Temporary scripts and experimental files
+ex.py
+DAMP3.PY
+pinV.py
+test_*.py
+temp_*.py
+experimental_*.py
+
+# Exclude all markdown except README.md
+*.md
+!README.md
