@@ -261,6 +261,17 @@
             align-items: center;
             gap: 0.5rem;
         }
+
+        /* Add styles for the location fields */
+        .form-check-input {
+            background-color: var(--input-bg);
+            border: 1px solid var(--border-color);
+        }
+        
+        .form-check-input:checked {
+            background-color: var(--primary);
+            border-color: var(--primary);
+        }
     </style>
 </head>
 <body>
@@ -282,6 +293,27 @@
                     <div class="mb-3">
                         <label for="video-title" class="form-label">Video Title</label>
                         <input type="text" class="form-control" id="video-title" placeholder="Enter a compelling title...">
+                    </div>
+
+                    <!-- Add optional city and country inputs with a toggle -->
+                    <div class="mb-3">
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" id="location-toggle" onchange="toggleLocationFields()">
+                            <label class="form-check-label" for="location-toggle">Include location in script</label>
+                        </div>
+                    </div>
+
+                    <div id="location-fields" style="display: none;" class="mb-3">
+                        <div class="row">
+                            <div class="col-6">
+                                <label for="city" class="form-label">City</label>
+                                <input type="text" class="form-control" id="city" placeholder="Enter city name...">
+                            </div>
+                            <div class="col-6">
+                                <label for="country" class="form-label">Country</label>
+                                <input type="text" class="form-control" id="country" placeholder="Enter country name...">
+                            </div>
+                        </div>
                     </div>
                     
                     <div class="ideas-container">
@@ -312,7 +344,6 @@
                         </div>
                     </div>
                     
-                    <!-- Voice Settings -->
                     <div class="voice-parameters">
                         <h5 class="mb-3" style="font-size: 1rem;">Voice Settings</h5>
                         
@@ -334,6 +365,23 @@
                             </select>
                         </div>
                         
+                        <!-- Add slider for speed -->
+                        <div class="mb-3">
+                            <div class="parameter-label">
+                                <label for="speed" class="form-label">Speed</label>
+                                <span class="value" id="speedValue">1.0</span>
+                            </div>
+                            <input type="range" class="form-range" id="speed" min="0.5" max="2.0" step="0.1" value="1.0" oninput="updateSpeedValue()">
+                        </div>
+                        
+                        <!-- Add slider for depth -->
+                        <div class="mb-3">
+                            <div class="parameter-label">
+                                <label for="depth" class="form-label">Voice Depth</label>
+                                <span class="value" id="depthValue">1</span>
+                            </div>
+                            <input type="range" class="form-range" id="depth" min="1" max="5" step="1" value="1" oninput="updateDepthValue()">
+                        </div>
                     </div>
                     
                     <div class="d-grid mt-4">
@@ -426,6 +474,18 @@
             }
         }
         
+        // Add toggle function for location fields
+        function toggleLocationFields() {
+            const locationToggle = document.getElementById('location-toggle');
+            const locationFields = document.getElementById('location-fields');
+            
+            if (locationToggle.checked) {
+                locationFields.style.display = 'block';
+            } else {
+                locationFields.style.display = 'none';
+            }
+        }
+        
         function generateScript() {
             const title = document.getElementById('video-title').value.trim();
             const idea1 = document.getElementById('idea1').value.trim();
@@ -460,6 +520,15 @@
             formData.append('idea1', idea1);
             formData.append('idea2', idea2);
             formData.append('idea3', idea3);
+            
+            // Add city and country only if the location toggle is checked
+            if (document.getElementById('location-toggle').checked) {
+                const city = document.getElementById('city').value.trim();
+                const country = document.getElementById('country').value.trim();
+                
+                if (city) formData.append('city', city);
+                if (country) formData.append('country', country);
+            }
             
             // Send request to backend
             fetch('/generate-script', {
@@ -548,8 +617,9 @@
         }
         
         function useScript() {
-            // Get the script text
+            // Get the script text and title
             const scriptText = document.getElementById('hidden-script').value;
+            const title = document.getElementById('video-title').value.trim();
             
             // Get voice settings
             const voiceId = document.getElementById('voice').value;
@@ -567,7 +637,8 @@
                 'text-content': scriptText,
                 'voice': voiceId,
                 'speed': speed,
-                'depth': depth
+                'depth': depth,
+                'title': title  // Add the title to be used for the filename
             };
             
             // Add all fields to form
