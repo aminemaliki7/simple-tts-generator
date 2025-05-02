@@ -16,6 +16,10 @@ from dotenv import load_dotenv
 # Import from our modules
 from tts import generate_simple_tts
 
+# Import the downloader modules at the top of your app.py file
+from media_downloaders import download_mp3, download_pinterest_video, check_yt_dlp_installed
+import uuid
+
 # Initialize Flask app
 app = Flask(__name__)
 app.secret_key = "simple_tts_generator"  # for session management
@@ -114,6 +118,7 @@ def index():
     prefill = request.args.get('prefill', '')
     return render_template('index.html', voices=AVAILABLE_VOICES, languages=AVAILABLE_LANGUAGES, prefill=prefill)
 
+# Update the upload route to store the title
 @app.route('/upload', methods=['POST'])
 def upload_file():
     # Get the input method (text or file)
@@ -124,8 +129,8 @@ def upload_file():
     speed = float(request.form.get('speed', 1.0))
     depth = int(request.form.get('depth', 1))
     
-    # Debug logging
-    print(f"Received TTS parameters: voice={voice_id}, speed={speed}, depth={depth}")
+    # Get title for the file if provided
+    title = request.form.get('title', '')
     
     # Generate a unique job ID
     job_id = generate_unique_id()
@@ -150,6 +155,7 @@ def upload_file():
     
     # Handle file upload
     else:
+        # ... (existing file upload code)
         if 'script' not in request.files:
             return jsonify({'error': 'No script file provided'}), 400
         
@@ -164,12 +170,22 @@ def upload_file():
         script_filename = secure_filename(script_file.filename)
         script_path = os.path.join(app.config['UPLOAD_FOLDER'], script_filename)
         script_file.save(script_path)
+        
+        # If no title was provided, use the filename (without extension) as title
+        if not title and script_filename:
+            title = os.path.splitext(script_filename)[0]
     
-    # Output file setup
+    # Generate safe filename from title if available
     output_filename = f"tts_{job_id}.mp3"
+    if title:
+        # Create a safe filename from the title
+        safe_title = secure_filename(title)
+        if safe_title:
+            output_filename = f"{safe_title}_{job_id}.mp3"
+    
     output_path = os.path.join(app.config['OUTPUT_FOLDER'], output_filename)
     
-    # Store speed and depth values in job info for reference
+    # Store title and other values in job info for reference
     jobs[job_id] = {
         'status': 'pending',
         'script_file': script_path,
@@ -178,7 +194,9 @@ def upload_file():
         'input_type': input_method,
         'voice_id': voice_id,
         'speed': speed,
-        'depth': depth
+        'depth': depth,
+        'title': title,
+        'filename': output_filename
     }
     
     # Start the processing task in a background thread
@@ -294,7 +312,10 @@ def download_file(job_id):
         return render_template('error.html', message="File not available for download.")
     
     output_file = jobs[job_id]['result']
-    return send_file(output_file, as_attachment=True)
+    # Get the custom filename from the job info
+    filename = jobs[job_id].get('filename', f"voiceover_{job_id}.mp3")
+    
+    return send_file(output_file, as_attachment=True, download_name=filename)
 
 @app.route('/stream-audio/<job_id>')
 def stream_audio(job_id):
@@ -365,22 +386,35 @@ def generate_shorts_script():
     
     # Configure prompt for Gemini
     prompt = f"""
-Write a concise, engaging voiceover script for a short-form video (30-60 seconds) based on the following:
+WWrite a short voiceover script for a YouTube Short (30–60 seconds) that feels deep, timeless, and quietly powerful — like a secret worth remembering. The style should feel calm and wise, similar to Robert Greene, but written in simple English that anyone at a B2 level can understand.
 
 TOPIC: {topic}
 
-Style and Guidelines:
-- Create a script that is EXACTLY 30-60 seconds when read aloud (approximately 80-160 words)
-- Start with an attention-grabbing hook
-- Use conversational, energetic language that feels authentic and spontaneous
-- Create a sense of urgency and excitement
-- Keep sentences short and punchy for easy delivery
-- Include a strong call-to-action at the end
-- NO lists, NO special formatting, NO bullet points, NO asterisks, NO text in brackets
-- The output must ONLY contain the spoken script — nothing else
-- Make it sound like a human conversation, not a corporate announcement
+Guidelines:
 
-Make sure the final result is clean, pure, flowing text ready for an AI voiceover, and the perfect length for short-form video platforms.
+    Script must be between 60–75 words (about 30–60 seconds aloud)
+
+    Use very simple, clear vocabulary (B2 level max)
+
+    Start with a hook that feels mysterious, wise, or quietly intense — something that stops the scroll
+
+    Speak like a calm, trusted voice — slow, thoughtful, like someone sharing a quiet truth
+
+    Avoid clichés, hype, or big motivational phrases
+
+    Use contrast, irony, or surprising insight — reveal something hidden in plain sight
+
+    Keep flow natural and smooth — short sentences, no complex grammar
+
+    End with a soft, reflective thought or a warm call to action (like: "Think about that", or "Let that sink in")
+
+    NO bullet points, formatting, brackets, or special characters — just clean voiceover text.no much pauses in the text
+
+    The output must only be the spoken script, ready for an AI or human voiceover
+
+It should feel cinematic, reflective, and easy to understand — like wisdom told simply.
+
+
 """
     
     try:
@@ -403,6 +437,7 @@ Make sure the final result is clean, pure, flowing text ready for an AI voiceove
     except Exception as e:
         print(f"Error generating shorts script: {e}")
         return jsonify({'error': 'Failed to generate script. Please try again later.'}), 500
+
 @app.route('/generate-script', methods=['POST'])
 def generate_script():
     # Get data from request
@@ -432,6 +467,7 @@ Style and Guidelines:
 - Organize the script into 3 chapters based on the main ideas (mention "Chapter 1", "Chapter 2", "Chapter 3" naturally in the text)
 - Add real-life relatable examples and emotional touches
 - Include simple practical tips in a conversational way
+- use very simple language, avoiding jargon or complex terms 
 - Smooth, natural transitions between sections
 - Keep paragraphs short and sentences simple for easy reading aloud
 - The total script length should be around 600–750 words
@@ -470,6 +506,206 @@ Make sure the final result is clean, pure, flowing text ready for an AI voiceove
 def script_generator():
     """Route for the AI script generator page"""
     return render_template('script_generator.html', voices=AVAILABLE_VOICES, languages=AVAILABLE_LANGUAGES)
+
+@app.route('/download-audio', methods=['POST'])
+def download_audio():
+    # Get the URL and optional filename
+    url = request.form.get('url', '').strip()
+    custom_filename = request.form.get('filename', '').strip()
+    
+    if not url:
+        return jsonify({'success': False, 'error': 'No URL provided'})
+    
+    # Check if yt-dlp is installed
+    if not check_yt_dlp_installed():
+        return jsonify({
+            'success': False, 
+            'error': 'yt-dlp is not installed. Please install it with: pip install yt-dlp'
+        })
+    
+    # Generate a unique ID for this download
+    download_id = str(uuid.uuid4())
+    
+    try:
+        # Create downloads directories if they don't exist
+        downloads_folder = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'downloads')
+        os.makedirs(downloads_folder, exist_ok=True)
+        
+        # Create a subfolder for audio downloads
+        audio_folder = os.path.join(downloads_folder, 'audio')
+        os.makedirs(audio_folder, exist_ok=True)
+        
+        # Download the MP3
+        output_file = download_mp3(url, audio_folder, custom_filename)
+        
+        if not output_file:
+            return jsonify({
+                'success': False,
+                'error': 'Failed to download audio. Please check the URL and try again.'
+            })
+        
+        # Get the filename from the path
+        filename = os.path.basename(output_file)
+        
+        # Store download info (using global dictionary)
+        if not hasattr(app, 'media_downloads'):
+            app.media_downloads = {}
+        
+        app.media_downloads[download_id] = {
+            'id': download_id,
+            'type': 'audio',
+            'url': url,
+            'file_path': output_file,
+            'filename': filename,
+            'timestamp': time.time()
+        }
+        
+        # Store download ID in session
+        if 'media_downloads' not in session:
+            session['media_downloads'] = []
+        session['media_downloads'].append(download_id)
+        session.modified = True
+        
+        return jsonify({
+            'success': True,
+            'download_id': download_id,
+            'filename': filename,
+            'download_url': url_for('download_media', download_id=download_id)
+        })
+        
+    except Exception as e:
+        print(f"Error downloading audio: {str(e)}")
+        return jsonify({
+            'success': False,
+            'error': f"An error occurred: {str(e)}"
+        })
+
+# Route for downloading Pinterest videos
+@app.route('/download-video', methods=['POST'])
+def download_video():
+    # Get the URL and optional filename
+    url = request.form.get('url', '').strip()
+    custom_filename = request.form.get('filename', '').strip()
+    
+    if not url:
+        return jsonify({'success': False, 'error': 'No URL provided'})
+    
+    # Check if yt-dlp is installed
+    if not check_yt_dlp_installed():
+        return jsonify({
+            'success': False, 
+            'error': 'yt-dlp is not installed. Please install it with: pip install yt-dlp'
+        })
+    
+    # Generate a unique ID for this download
+    download_id = str(uuid.uuid4())
+    
+    try:
+        # Create downloads directories if they don't exist
+        downloads_folder = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'downloads')
+        os.makedirs(downloads_folder, exist_ok=True)
+        
+        # Create a subfolder for video downloads
+        video_folder = os.path.join(downloads_folder, 'video')
+        os.makedirs(video_folder, exist_ok=True)
+        
+        # Download the video
+        output_file = download_pinterest_video(url, video_folder, custom_filename)
+        
+        if not output_file:
+            return jsonify({
+                'success': False,
+                'error': 'Failed to download video. Please check the URL and try again.'
+            })
+        
+        # Get the filename from the path
+        filename = os.path.basename(output_file)
+        
+        # Store download info (using global dictionary)
+        if not hasattr(app, 'media_downloads'):
+            app.media_downloads = {}
+        
+        app.media_downloads[download_id] = {
+            'id': download_id,
+            'type': 'video',
+            'url': url,
+            'file_path': output_file,
+            'filename': filename,
+            'timestamp': time.time()
+        }
+        
+        # Store download ID in session
+        if 'media_downloads' not in session:
+            session['media_downloads'] = []
+        session['media_downloads'].append(download_id)
+        session.modified = True
+        
+        return jsonify({
+            'success': True,
+            'download_id': download_id,
+            'filename': filename,
+            'download_url': url_for('download_media', download_id=download_id)
+        })
+        
+    except Exception as e:
+        print(f"Error downloading video: {str(e)}")
+        return jsonify({
+            'success': False,
+            'error': f"An error occurred: {str(e)}"
+        })
+
+# Route for downloading the media file
+@app.route('/download-media/<download_id>')
+def download_media(download_id):
+    if not hasattr(app, 'media_downloads'):
+        app.media_downloads = {}
+        
+    if download_id not in app.media_downloads:
+        return render_template('error.html', message="Download not found.")
+    
+    download = app.media_downloads[download_id]
+    return send_file(
+        download['file_path'],
+        as_attachment=True,
+        download_name=download['filename']
+    )
+
+# Route for download history
+@app.route('/download-history')
+def download_history():
+    user_downloads = session.get('media_downloads', [])
+    user_download_data = {}
+    
+    if not hasattr(app, 'media_downloads'):
+        app.media_downloads = {}
+    
+    for download_id in user_downloads:
+        if download_id in app.media_downloads:
+            user_download_data[download_id] = app.media_downloads[download_id]
+    
+    return render_template('download_history.html', downloads=user_download_data)
+
+# Add a conversion option to send downloaded audio to voice generator
+@app.route('/convert-to-voice/<download_id>')
+def convert_to_voice(download_id):
+    if not hasattr(app, 'media_downloads'):
+        app.media_downloads = {}
+        
+    if download_id not in app.media_downloads or app.media_downloads[download_id]['type'] != 'audio':
+        return render_template('error.html', message="Audio file not found.")
+    
+    # Get the file path
+    audio_file = app.media_downloads[download_id]['file_path']
+    
+    # Redirect to the main voice generator page with a parameter
+    # to indicate we want to use this audio file
+    return redirect(url_for('index', audio_source=download_id))
+
+
+@app.route('/media-downloader')
+def media_downloader():
+    """Route for the media downloader page"""
+    return render_template('media_downloader.html')
     
 if __name__ == '__main__':
     app.run(debug=True)
