@@ -4,7 +4,7 @@ import time
 from pydub import AudioSegment
 from pydub.effects import low_pass_filter, speedup
 
-async def generate_simple_tts(script_file, output_audio, voice_id, speed=0.2, depth=5, is_ssml=False):
+async def generate_simple_tts(script_file, output_audio, voice_id, speed=-0.1, depth=9, is_ssml=False):
     """Generate TTS audio with customizable speed and depth.
    
     Args:

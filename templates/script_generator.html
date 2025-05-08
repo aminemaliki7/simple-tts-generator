@@ -333,7 +333,6 @@
                                 {% endfor %}
                             </select>
                         </div>
-                        
                     </div>
                     
                     <div class="d-grid mt-4">
@@ -387,18 +386,6 @@
     </div>
     
     <script>
-        function updateSpeedValue() {
-            const speedSlider = document.getElementById("speed");
-            const speedValue = document.getElementById("speedValue");
-            speedValue.textContent = speedSlider.value;
-        }
-        
-        function updateDepthValue() {
-            const depthSlider = document.getElementById("depth");
-            const depthValue = document.getElementById("depthValue");
-            depthValue.textContent = depthSlider.value;
-        }
-        
         function updateVoices() {
             const languageSelect = document.getElementById("language");
             const voiceSelect = document.getElementById("voice");
@@ -553,8 +540,6 @@
             
             // Get voice settings
             const voiceId = document.getElementById('voice').value;
-            const speed = document.getElementById('speed').value;
-            const depth = document.getElementById('depth').value;
             
             // Create a form to submit to the voice generator
             const form = document.createElement('form');
@@ -565,9 +550,7 @@
             const fields = {
                 'input-method': 'text',
                 'text-content': scriptText,
-                'voice': voiceId,
-                'speed': speed,
-                'depth': depth
+                'voice': voiceId
             };
             
             // Add all fields to form
@@ -587,8 +570,6 @@
         // Initialize on page load
         document.addEventListener("DOMContentLoaded", function() {
             updateVoices();
-            updateSpeedValue();
-            updateDepthValue();
         });
     </script>
     

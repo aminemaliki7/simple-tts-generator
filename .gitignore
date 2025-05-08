@@ -1,6 +1,8 @@
-.env
-.vercel
-.vercelignore
-vercel.json
+downloads/
+uploads/
+outputs/
+__pycache__/
+*.mp3
+*.mp4
 *.log
-/Pinterst vide
+.env

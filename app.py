@@ -386,15 +386,23 @@ def generate_shorts_script():
     
     # Configure prompt for Gemini
     prompt = f"""
-WWrite a short voiceover script for a YouTube Short (30–60 seconds) that feels deep, timeless, and quietly powerful — like a secret worth remembering. The style should feel calm and wise, similar to Robert Greene, but written in simple English that anyone at a B2 level can understand.
+Write a short voiceover script for a YouTube Short (30–60 seconds) that feels deep, timeless, and quietly powerful — like a secret worth remembering. The style should feel calm and wise, similar to Robert Greene, but written in simple English that anyone at a B2 level can understand.
 
 TOPIC: {topic}
 
 Guidelines:
 
     Script must be between 60–75 words (about 30–60 seconds aloud)
+    
+    adapt the tone to be calm, wise, and reflective — like a quiet truth being shared
 
-    Use very simple, clear vocabulary (B2 level max)
+    use a simple, conversational style that feels like a friend sharing a secret
+
+    adapte rick rubin's style: "The best way to get what you want is to help others get what they want."
+    Use a calm, wise tone that feels timeless and deep but is easy to understand
+    Use simple, relatable language that anyone can grasp
+
+    Use very simple
 
     Start with a hook that feels mysterious, wise, or quietly intense — something that stops the scroll
 
@@ -406,11 +414,12 @@ Guidelines:
 
     Keep flow natural and smooth — short sentences, no complex grammar
 
-    End with a soft, reflective thought or a warm call to action (like: "Think about that", or "Let that sink in")
+    End with a soft, reflective thought or a warm call to action that invites the viewer to think or feel something
 
     NO bullet points, formatting, brackets, or special characters — just clean voiceover text.no much pauses in the text
 
     The output must only be the spoken script, ready for an AI or human voiceover
+    
 
 It should feel cinematic, reflective, and easy to understand — like wisdom told simply.
 
@@ -451,32 +460,43 @@ def generate_script():
     
     # Configure prompt for Gemini
     prompt = f"""
-Write a calm, relatable, and emotionally engaging voiceover script for a YouTube video based on the following:
+Create a conversational, engaging script for a short educational video that:
+
+1) Teaches a practical concept, hack, or mental model in a direct, no-fluff style
+2) Uses simple language that flows naturally when spoken aloud
+3) Follows a clear structure: hook → explanation → examples → application → call-to-action
 
 TITLE: {title}
 
-MAIN IDEAS:
-1. {idea1}
-2. {idea2}
-3. {idea3}
+Script Requirements:
+- Start with a striking hook that challenges assumptions (e.g., "You don't need to be creative to come up with creative ideas...")
+- Speak directly to the viewer using "you" statements throughout
+- Explain concepts using everyday language as if talking to a friend
+- Include specific, relatable examples that prove your point (like Jobs/iPhone, Shakespeare/stories)
+- Break down the concept into a simple process anyone can follow
+- Add unexpected connections or surprising insights that create "aha" moments
+- End with practical application advice that viewers can implement immediately
 
-Style and Guidelines:
-- Speak directly to the listener like a friend having a real conversation
-- Use a warm, lightly humorous, and very human tone
-- Start with a strong, relatable hook (a personal question or a shared feeling)
-- Organize the script into 3 chapters based on the main ideas (mention "Chapter 1", "Chapter 2", "Chapter 3" naturally in the text)
-- Add real-life relatable examples and emotional touches
-- Include simple practical tips in a conversational way
-- use very simple language, avoiding jargon or complex terms 
-- Smooth, natural transitions between sections
-- Keep paragraphs short and sentences simple for easy reading aloud
-- The total script length should be around 600–750 words
-- NO lists, NO special formatting, NO bullet points, NO asterisks, NO text in brackets
-- The output must ONLY contain the spoken script — nothing else
-- Write it as if it will be directly read aloud by an AI voice
--End the script with a natural, genuine call to action encouraging the listener to connect, comment, or apply the idea shared, phrased warmly and conversationally
+Style Guide:
+- Write in short, punchy sentences that maintain momentum
+- Create a natural speaking rhythm with varied sentence length
+- Avoid all formatting (no lists, bullet points, headings, or special characters)
+- Use contractions and casual phrasing for a conversational feel
+- Include subtle transitions between ideas that flow logically
+- Incorporate rhetorical questions that make viewers think
+- Blend authoritative knowledge with friendly, accessible tone
+- Include specific action steps within the natural flow of speech
+- Keep the entire script between 300-400 words for a 2-3 minute video
 
-Make sure the final result is clean, pure, flowing text ready for an AI voiceover.
+CONTENT STRUCTURE:
+1. Hook challenging a common belief about {idea1}
+2. Simple explanation of the concept/process behind {idea2}
+3. Real-world examples showing the concept in action
+4. Step-by-step method viewers can apply to {idea3}
+5. Quick demonstration of the method with a specific example
+6. Final takeaway reinforcing how accessible/powerful this approach is
+
+Return ONLY the clean, ready-to-record script with no additional text or formatting.
 """
 
     
@@ -706,6 +726,110 @@ def convert_to_voice(download_id):
 def media_downloader():
     """Route for the media downloader page"""
     return render_template('media_downloader.html')
+
+
+@app.route('/marketing-generator')
+def marketing_generator():
+    """Route for the marketing script generator page"""
+    return render_template('marketing_generator.html', voices=AVAILABLE_VOICES, languages=AVAILABLE_LANGUAGES)
+
+@app.route('/generate-marketing-script', methods=['POST'])
+def generate_marketing_script():
+    # Get data from request
+    content_type = request.form.get('contentType', '').strip()
+    product_name = request.form.get('productName', '').strip()
+    target_audience = request.form.get('targetAudience', '').strip()
+    main_benefit = request.form.get('mainBenefit', '').strip()
+    key_features = request.form.get('keyFeatures', '').strip()
+    call_to_action = request.form.get('callToAction', '').strip()
+    script_length = request.form.get('scriptLength', 'medium').strip()
+    tone = request.form.get('tone', 'professional').strip()
+    additional_info = request.form.get('additionalInfo', '').strip()
+    
+    # Validate required fields
+    if not product_name or not target_audience or not main_benefit:
+        return jsonify({'error': 'Please provide product name, target audience, and main benefit'}), 400
+    
+    # Map script length to word count and duration
+    length_mapping = {
+        'short': "80-120 words (30-60 seconds)",
+        'medium': "150-250 words (1-2 minutes)",
+        'long': "300-450 words (2-3 minutes)"
+    }
+    
+    # Map tone to descriptive text
+    tone_descriptions = {
+        'professional': "professional, authoritative, and trustworthy",
+        'conversational': "friendly, casual, and conversational",
+        'enthusiastic': "energetic, passionate, and excited",
+        'empathetic': "understanding, compassionate, and empathetic",
+        'humorous': "light, engaging, and subtly humorous",
+        'urgent': "urgent, compelling, and action-oriented"
+    }
+    
+    # Configure prompt for Gemini based on script type
+    prompt_prefix = ""
+    
+    if content_type == "product_explainer":
+        prompt_prefix = "Create a persuasive product explainer script that demonstrates features and benefits"
+    elif content_type == "lead_generation":
+        prompt_prefix = "Create a lead generation script focused on collecting contact information in exchange for value"
+    elif content_type == "sales_pitch":
+        prompt_prefix = "Create a direct sales pitch script designed to convert viewers into customers"
+    elif content_type == "testimonial_style":
+        prompt_prefix = "Create a testimonial-style script that tells a success story about using this product"
+    elif content_type == "educational":
+        prompt_prefix = "Create an educational marketing script that teaches while subtly promoting the product"
+    
+    # Build the complete prompt
+    prompt = f"""
+{prompt_prefix} for a {tone_descriptions.get(tone, "professional")} marketing video.
+
+PRODUCT: {product_name}
+TARGET AUDIENCE: {target_audience}
+PRIMARY BENEFIT: {main_benefit}
+KEY FEATURES: {key_features}
+CALL TO ACTION: {call_to_action}
+ADDITIONAL CONTEXT: {additional_info}
+
+Guidelines:
+- Script should be {length_mapping.get(script_length, "150-250 words (1-2 minutes)")} when spoken aloud
+- Use a {tone_descriptions.get(tone, "professional")} tone throughout
+- Start with a strong hook that grabs attention
+- Focus on benefits to the audience, not just features
+- Address pain points and how the product solves them
+- Include the call to action clearly and persuasively
+- Use conversational language (avoid jargon unless necessary for the audience)
+- Make the value proposition crystal clear
+- Create emotional connection with the audience when appropriate
+- Use social proof elements if relevant
+- Write in a natural speaking voice with smooth transitions
+- IMPORTANT: Output ONLY the script text, nothing else
+- NO bullet points, NO formatting, NO notes - just clean voiceover text
+
+The script should feel persuasive and compelling, with a clear focus on how {product_name} helps {target_audience} achieve {main_benefit}.
+"""
+    
+    try:
+        # Configure the Gemini API with your key
+        setup_gemini_api(app.config['GEMINI_API_KEY'])
+           
+        # Generate content with Gemini
+        model = genai.GenerativeModel('gemini-2.0-flash')
+        response = model.generate_content(prompt)
+       
+        # Extract the generated text
+        script_text = response.text
+       
+        # Return the generated script
+        return jsonify({
+            'success': True,
+            'script': script_text
+        })
+    
+    except Exception as e:
+        print(f"Error generating marketing script: {e}")
+        return jsonify({'error': 'Failed to generate script. Please try again later.'}), 500
     
 if __name__ == '__main__':
     app.run(debug=True)

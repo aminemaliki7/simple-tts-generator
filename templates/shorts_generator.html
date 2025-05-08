@@ -7,253 +7,224 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.1/css/all.min.css">
     <style>
-        :root {
-            --primary: #0068FF;
-            --primary-dark: #0050C0;
-            --secondary: #4D4D4D;
-            --tertiary: #808080;
-            --dark: #000000;
-            --light: #FFFFFF;
-            --gray: #F5F5F7;
-            --gray-dark: #86868b;
-            --success: #2fd471;
-            --background: #000000;
-            --card-bg: #0D0D0D;
-            --input-bg: #1C1C1E;
-            --border-color: #333333;
-            --slow-color: rgba(255, 165, 0, 0.3);
-            --fast-color: rgba(0, 204, 102, 0.3);
-            --deep-color: rgba(128, 0, 128, 0.3);
-            --medium-deep-color: rgba(0, 104, 255, 0.3);
-            --default-param-color: rgba(0, 104, 255, 0.2);
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
         
         body {
-            font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
-            background-color: var(--background);
-            color: var(--light);
-            padding: 0;
-            margin: 0;
-        }
-        
-        .gradient-bg {
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 300px;
-            background: linear-gradient(180deg, rgba(30,30,30,1) 0%, rgba(0,0,0,1) 100%);
-            z-index: -1;
+            font-family: monospace;
+            background-color: #fff;
+            color: #000;
+            font-size: 14px;
+            line-height: 1.4;
         }
         
         .app-container {
             max-width: 1000px;
             margin: 0 auto;
-            padding: 2rem 1rem;
-        }
-        
-        .card {
-            background-color: var(--card-bg);
-            border-radius: 16px;
-            border: 1px solid var(--border-color);
-            box-shadow: 0 10px 25px rgba(0,0,0,0.15);
-            padding: 2rem;
-            margin-bottom: 2rem;
+            padding: 40px 20px;
         }
         
         .header {
-            color: var(--light);
-            margin-bottom: 1.5rem;
             text-align: center;
-            padding: 1rem 0 2rem;
+            margin-bottom: 40px;
         }
         
         .header h1 {
-            font-weight: 600;
-            font-size: 2.4rem;
-            margin-bottom: 0.5rem;
-            letter-spacing: -0.015em;
+            font-size: 24px;
+            font-weight: normal;
+            letter-spacing: 8px;
+            margin-bottom: 10px;
+            text-transform: uppercase;
         }
         
         .header p {
-            font-weight: 400;
-            font-size: 1.1rem;
-            opacity: 0.7;
-            letter-spacing: -0.01em;
+            font-size: 12px;
+            letter-spacing: 1px;
+            text-transform: uppercase;
         }
         
-        .form-label {
-            font-weight: 500;
-            color: var(--light);
-            margin-bottom: 0.5rem;
+        .card {
+            border: 1px solid #000;
+            padding: 40px;
+            margin-bottom: 40px;
         }
         
-        .form-control {
-            border: 1px solid var(--border-color);
-            border-radius: 12px;
-            padding: 0.75rem 1rem;
-            box-shadow: none;
-            transition: all 0.2s ease;
-            background-color: var(--input-bg);
-            color: var(--light);
+        .shorts-info {
+            border: 1px solid #000;
+            padding: 20px;
+            margin-bottom: 30px;
         }
         
-        .form-control:focus {
-            border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(0, 104, 255, 0.2);
-            background-color: var(--input-bg);
+        .shorts-info-title {
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 10px;
+            font-weight: bold;
         }
         
-        .form-select {
-            border: 1px solid var(--border-color);
-            border-radius: 12px;
-            padding: 0.75rem 1rem;
-            box-shadow: none;
-            transition: all 0.2s ease;
-            background-color: var(--input-bg);
-            color: var(--light);
-        }
-        
-        .form-select:focus {
-            border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(0, 104, 255, 0.2);
-            background-color: var(--input-bg);
-        }
-        
-        .btn-primary {
-            background-color: var(--primary);
-            border: none;
-            border-radius: 20px;
-            padding: 0.85rem 1.75rem;
-            font-weight: 500;
-            transition: all 0.2s ease;
-            letter-spacing: -0.01em;
-        }
-        
-        .btn-primary:hover {
-            background-color: var(--primary-dark);
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(0, 104, 255, 0.3);
-        }
-        
-        .btn-outline-secondary {
-            color: var(--light);
-            background-color: rgba(255, 255, 255, 0.08);
-            border: none; 
-            border-radius: 20px;
-            padding: 0.5rem 1rem;
-            transition: all 0.2s ease;
-        }
-        
-        .btn-outline-secondary:hover {
-            background-color: rgba(255, 255, 255, 0.15);
-            color: var(--light);
-        }
-        
-        .text-area {
-            min-height: 150px;
-            resize: vertical;
-            font-size: 1rem;
+        .shorts-info-text {
+            font-size: 12px;
+            line-height: 1.6;
         }
         
         .parameter-container {
-            background-color: rgba(30, 30, 30, 0.5);
-            border-radius: 12px;
-            padding: 1.5rem;
-            margin-bottom: 1.5rem;
-            border: 1px solid var(--border-color);
+            border: 1px solid #000;
+            padding: 30px;
+            margin-bottom: 30px;
         }
         
         .section-title {
-            font-size: 1.2rem;
-            font-weight: 600;
-            margin-bottom: 1rem;
-            color: var(--light);
-            letter-spacing: -0.01em;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 20px;
         }
         
-        .icon-btn {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
+        .form-label {
+            display: block;
+            margin-bottom: 10px;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
         }
         
-        .feature-badge {
-            font-size: 0.75rem;
-            background-color: rgba(255, 255, 255, 0.1);
-            color: var(--light);
-            padding: 2px 8px;
-            border-radius: 12px;
-            margin-left: 0.5rem;
-            font-weight: 500;
+        .form-control {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #000;
+            background: #fff;
+            color: #000;
+            font-family: monospace;
+            font-size: 14px;
+        }
+        
+        .form-control:focus {
+            outline: none;
+            border-color: #000;
+            box-shadow: none;
+        }
+        
+        .form-select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #000;
+            background: #fff;
+            color: #000;
+            font-family: monospace;
+            font-size: 14px;
+        }
+        
+        .form-select:focus {
+            outline: none;
+            border-color: #000;
+            box-shadow: none;
+        }
+        
+        .form-text {
+            font-size: 11px;
+            margin-top: 5px;
+            color: #666;
+        }
+        
+        .btn {
+            display: inline-block;
+            padding: 12px 20px;
+            border: 1px solid #000;
+            background: #fff;
+            color: #000;
+            text-decoration: none;
+            text-transform: uppercase;
+            font-size: 12px;
+            letter-spacing: 1px;
+            cursor: pointer;
+            font-family: monospace;
+        }
+        
+        .btn:hover {
+            background: #000;
+            color: #fff;
+        }
+        
+        .btn-primary {
+            background: #000;
+            color: #fff;
+        }
+        
+        .btn-primary:hover {
+            background: #fff;
+            color: #000;
+        }
+        
+        .btn-primary:disabled {
+            background: #999;
+            border-color: #999;
+            color: #fff;
+            cursor: not-allowed;
+        }
+        
+        .btn-lg {
+            padding: 15px 30px;
+            width: 100%;
+        }
+        
+        .btn-sm {
+            padding: 5px 10px;
+            font-size: 10px;
+        }
+        
+        .btn-outline-secondary {
+            border: 1px solid #000;
+            background: #fff;
+            color: #000;
+        }
+        
+        .btn-outline-secondary:hover {
+            background: #000;
+            color: #fff;
         }
         
         .script-output-container {
-            background-color: rgba(30, 30, 30, 0.5);
-            border-radius: 12px;
-            padding: 1.5rem;
-            margin-top: 2rem;
-            border: 1px solid var(--border-color);
+            border: 1px solid #000;
+            padding: 30px;
+            margin-top: 40px;
             display: none;
         }
         
         #scriptOutput {
             white-space: pre-wrap;
-            color: var(--light);
-            font-size: 1rem;
+            font-family: monospace;
+            font-size: 14px;
             line-height: 1.6;
+            margin-bottom: 20px;
         }
         
         .spinner-border {
             display: none;
+            width: 14px;
+            height: 14px;
+            border-width: 2px;
         }
         
-        .footer {
-            text-align: center;
-            color: var(--gray-dark);
-            font-size: 0.9rem;
-            margin-top: 2rem;
-            opacity: 0.7;
+        .options-toggle {
+            cursor: pointer;
+            user-select: none;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
         }
         
-        .actions {
-            display: flex;
-            justify-content: center;
-            gap: 1rem;
-            margin-top: 1rem;
-        }
-        
-        .shorts-info {
-            background-color: rgba(0, 104, 255, 0.1);
-            border: 1px solid rgba(0, 104, 255, 0.2);
-            border-radius: 12px;
-            padding: 1.2rem;
-            margin-bottom: 1.5rem;
-        }
-        
-        .shorts-info-title {
-            color: var(--light);
-            font-size: 1rem;
-            font-weight: 600;
-            margin-bottom: 0.5rem;
-            display: flex;
-            align-items: center;
-        }
-        
-        .shorts-info-text {
-            color: var(--light);
-            opacity: 0.8;
-            font-size: 0.9rem;
-            margin-bottom: 0.5rem;
+        .options-toggle:hover {
+            text-decoration: underline;
         }
         
         .tts-options {
-            padding: 1.5rem;
-            margin-top: 1.5rem;
-            margin-bottom: 1rem;
-            background-color: rgba(30, 30, 30, 0.5);
-            border-radius: 12px;
-            border: 1px solid var(--border-color);
+            border: 1px solid #000;
+            padding: 30px;
+            margin-top: 20px;
             display: none;
         }
         
@@ -261,67 +232,198 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 0.5rem;
+            margin-bottom: 10px;
+        }
+        
+        .parameter-label label {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
         }
         
         .parameter-label .value {
-            font-weight: 600;
-            color: var(--light);
-            background-color: var(--default-param-color);
+            font-weight: bold;
+            border: 1px solid #000;
             padding: 2px 8px;
-            border-radius: 6px;
-            transition: background-color 0.3s ease;
         }
         
         .form-range {
-            height: 6px;
-            border-radius: 3px;
-            background-color: var(--border-color);
+            width: 100%;
+            -webkit-appearance: none;
+            appearance: none;
+            height: 1px;
+            background: #000;
+            outline: none;
+            margin: 10px 0;
         }
         
         .form-range::-webkit-slider-thumb {
-            background-color: var(--light);
-            width: 18px;
-            height: 18px;
-            border: 2px solid var(--primary);
+            -webkit-appearance: none;
+            width: 15px;
+            height: 15px;
+            background: #000;
+            cursor: pointer;
+            border: 2px solid #fff;
+        }
+        
+        .form-range::-moz-range-thumb {
+            width: 15px;
+            height: 15px;
+            background: #000;
+            cursor: pointer;
+            border: 2px solid #fff;
         }
         
         .three-col-labels {
             display: grid;
             grid-template-columns: 1fr 1fr 1fr;
             text-align: center;
-            font-size: 0.8rem;
-            color: var(--gray-dark);
+            font-size: 11px;
+            color: #666;
         }
         
-        .param-info {
-            color: var(--gray-dark);
-            font-size: 0.85rem;
-            margin-top: 0.5rem;
+        .actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            margin-top: 40px;
         }
         
-        .options-toggle {
+        .icon-btn {
+            flex: 1;
+            min-width: 200px;
+            text-align: center;
+        }
+        
+        .footer {
+            text-align: center;
+            font-size: 11px;
+            color: #666;
+            line-height: 1.6;
+            margin-top: 40px;
+        }
+        
+        .footer p {
+            margin: 5px 0;
+        }
+        
+        .modal-content {
+            background-color: #fff;
+            color: #000;
+            border: 1px solid #000;
+        }
+        
+        .modal-header {
+            border-bottom: 1px solid #000;
+            padding: 20px;
+        }
+        
+        .modal-title {
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .modal-body {
+            padding: 20px;
+        }
+        
+        .modal-footer {
+            border-top: 1px solid #000;
+            padding: 20px;
+        }
+        
+        .btn-close {
+            width: 30px;
+            height: 30px;
+            border: none;
+            background: none;
+            font-size: 20px;
+            color: #000;
             cursor: pointer;
-            user-select: none;
-            transition: color 0.3s ease;
         }
         
-        .options-toggle:hover {
-            color: var(--primary);
+        .text-area {
+            min-height: 150px;
+            resize: vertical;
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #000;
+            font-family: monospace;
+            font-size: 14px;
         }
         
-        .audio-preview {
+        .row {
+            display: flex;
+            gap: 40px;
+            flex-wrap: wrap;
+        }
+        
+        .col-md-6 {
+            flex: 1;
+            min-width: 200px;
+        }
+        
+        .mb-3 {
+            margin-bottom: 30px;
+        }
+        
+        .mt-4 {
+            margin-top: 40px;
+        }
+        
+        .d-grid {
+            display: grid;
+        }
+        
+        .d-flex {
+            display: flex;
+        }
+        
+        .justify-content-between {
+            justify-content: space-between;
+        }
+        
+        .align-items-center {
+            align-items: center;
+        }
+        
+        /* Hide Bootstrap elements that don't fit our design */
+        .fas, .far {
             display: none;
-            margin-top: 1rem;
-            padding: 1rem;
-            background-color: rgba(0, 104, 255, 0.05);
-            border-radius: 12px;
-            border: 1px solid rgba(0, 104, 255, 0.1);
+        }
+        
+        @media (max-width: 768px) {
+            .app-container {
+                padding: 20px 10px;
+            }
+            
+            .card {
+                padding: 20px;
+            }
+            
+            .row {
+                flex-direction: column;
+                gap: 30px;
+            }
+            
+            .col-md-6 {
+                min-width: auto;
+            }
+            
+            .actions {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .icon-btn {
+                width: 100%;
+                min-width: auto;
+            }
         }
     </style>
 </head>
 <body>
-    <div class="gradient-bg"></div>
     <div class="app-container">
         <div class="header">
             <h1>Shorts Script Generator</h1>
@@ -330,9 +432,7 @@
         
         <div class="card">
             <div class="shorts-info">
-                <h5 class="shorts-info-title">
-                    <i class="fas fa-bolt me-2"></i>Perfect for 30-60 Second Videos
-                </h5>
+                <h5 class="shorts-info-title">Perfect for 30-60 Second Videos</h5>
                 <p class="shorts-info-text">Generate punchy, attention-grabbing scripts optimized for TikTok, Instagram Reels, and YouTube Shorts. These scripts are designed to be approximately 80-160 words—the ideal length for short-form content.</p>
             </div>
             
@@ -343,8 +443,8 @@
                     <div class="mb-3">
                         <label for="topic" class="form-label">What's your short video about?</label>
                         <input type="text" class="form-control" id="topic" name="topic" placeholder="e.g., '3 productivity hacks that actually work'" required>
-                        <div class="form-text mt-2" style="color: var(--gray-dark);">
-                            <i class="fas fa-lightbulb me-1"></i> Try topics like "The secret to perfect coffee", "Why most people can't focus", or "How to save money without trying"
+                        <div class="form-text mt-2">
+                            Try topics like "The secret to perfect coffee", "Why most people can't focus", or "How to save money without trying"
                         </div>
                     </div>
                 </div>
@@ -352,7 +452,7 @@
                 <div class="d-grid">
                     <button type="submit" class="btn btn-primary btn-lg" id="generateBtn">
                         <span class="spinner-border spinner-border-sm me-2" id="loadingSpinner" role="status" aria-hidden="true"></span>
-                        <i class="fas fa-wand-magic-sparkles me-2"></i>Generate Shorts Script
+                        Generate Shorts Script
                     </button>
                 </div>
             </form>
@@ -360,21 +460,13 @@
             <div class="script-output-container" id="outputContainer">
                 <h4 class="section-title d-flex justify-content-between align-items-center">
                     <span>Generated Script</span>
-                    <button class="btn btn-outline-secondary btn-sm" id="copyBtn">
-                        <i class="fas fa-copy me-1"></i>Copy
-                    </button>
+                    <button class="btn btn-outline-secondary btn-sm" id="copyBtn">Copy</button>
                 </h4>
                 <div id="scriptOutput"></div>
                 
                 <div class="mt-4 d-flex justify-content-between align-items-center">
-                    <span class="options-toggle" id="showOptionsBtn">
-                        <i class="fas fa-sliders me-1"></i> 
-                        Show voice options
-                    </span>
-                    
-                    <button type="button" class="btn btn-outline-secondary" id="editScriptBtn">
-                        <i class="fas fa-pen me-1"></i>Edit Script
-                    </button>
+                    <span class="options-toggle" id="showOptionsBtn">Show voice options</span>
+                    <button type="button" class="btn btn-outline-secondary" id="editScriptBtn">Edit Script</button>
                 </div>
                 
                 <!-- Voice options (hidden by default) -->
@@ -406,7 +498,6 @@
                     
                     <div class="row">
                         <div class="col-md-6">
-                            <!-- Enhanced Speed Slider -->
                             <div class="mb-3">
                                 <div class="parameter-label">
                                     <label for="speed">Speed</label>
@@ -421,7 +512,6 @@
                             </div>
                         </div>
                         <div class="col-md-6">
-                            <!-- Enhanced Depth Slider -->
                             <div class="mb-3">
                                 <div class="parameter-label">
                                     <label for="depth">Voice Depth</label>
@@ -442,26 +532,15 @@
                     <input type="hidden" id="input-method" name="input-method" value="text">
                     
                     <div class="d-grid mt-4">
-                        <button type="submit" class="btn btn-primary" id="generateVoiceBtn">
-                            <i class="fas fa-microphone me-2"></i>Generate Voice
-                        </button>
+                        <button type="submit" class="btn btn-primary" id="generateVoiceBtn">Generate Voice</button>
                     </div>
                 </form>
             </div>
             
             <div class="actions mt-4">
-                <a href="/" class="btn btn-outline-secondary icon-btn">
-                    <i class="fas fa-home"></i>
-                    Back to Home
-                </a>
-                <a href="/script-generator" class="btn btn-outline-secondary icon-btn">
-                    <i class="fas fa-pen"></i>
-                    Full Script Generator
-                </a>
-                <a href="/dashboard" class="btn btn-outline-secondary icon-btn">
-                    <i class="fas fa-history"></i>
-                    View History
-                </a>
+                <a href="/" class="btn btn-outline-secondary icon-btn">Back to Home</a>
+                <a href="/script-generator" class="btn btn-outline-secondary icon-btn">Full Script Generator</a>
+                <a href="/dashboard" class="btn btn-outline-secondary icon-btn">View History</a>
             </div>
         </div>
         
@@ -473,15 +552,15 @@
     
     <div class="modal fade" id="editScriptModal" tabindex="-1" aria-labelledby="editScriptModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-lg">
-            <div class="modal-content" style="background-color: var(--card-bg); color: var(--light); border: 1px solid var(--border-color);">
-                <div class="modal-header" style="border-bottom-color: var(--border-color);">
+            <div class="modal-content">
+                <div class="modal-header">
                     <h5 class="modal-title" id="editScriptModalLabel">Edit Script</h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">×</button>
                 </div>
                 <div class="modal-body">
                     <textarea id="editScriptText" class="form-control text-area" style="min-height: 250px;"></textarea>
                 </div>
-                <div class="modal-footer" style="border-top-color: var(--border-color);">
+                <div class="modal-footer">
                     <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
                     <button type="button" class="btn btn-primary" id="saveScriptBtn">Save Changes</button>
                 </div>
@@ -496,35 +575,14 @@
             const speedSlider = document.getElementById("speed");
             const speedValue = document.getElementById("speedValue");
             const value = parseFloat(speedSlider.value);
-            
-            // Format to one decimal place
             speedValue.textContent = value.toFixed(1);
-            
-            // Provide visual feedback based on value
-            if (value < 0.8) {
-                speedValue.style.backgroundColor = "var(--slow-color)"; // Amber for "very slow"
-            } else if (value > 1.2) {
-                speedValue.style.backgroundColor = "var(--fast-color)"; // Green for "very fast"
-            } else {
-                speedValue.style.backgroundColor = "var(--default-param-color)"; // Default blue
-            }
         }
         
         function updateDepthValue() {
             const depthSlider = document.getElementById("depth");
             const depthValue = document.getElementById("depthValue");
             const value = parseInt(depthSlider.value);
-            
             depthValue.textContent = value;
-            
-            // Provide visual feedback based on depth level
-            if (value > 3) {
-                depthValue.style.backgroundColor = "var(--deep-color)"; // Purple for "very deep"
-            } else if (value > 1) {
-                depthValue.style.backgroundColor = "var(--medium-deep-color)"; // Stronger blue for "somewhat deep"
-            } else {
-                depthValue.style.backgroundColor = "var(--default-param-color)"; // Default blue
-            }
         }
         
         function updateVoices() {
@@ -613,11 +671,11 @@
                 const scriptText = $('#scriptOutput').text();
                 navigator.clipboard.writeText(scriptText).then(function() {
                     // Change button text temporarily
-                    const originalText = $(this).html();
-                    $(this).html('<i class="fas fa-check me-1"></i>Copied!');
+                    const originalText = $(this).text();
+                    $(this).text('Copied!');
                     
                     setTimeout(function() {
-                        $('#copyBtn').html(originalText);
+                        $('#copyBtn').text(originalText);
                     }, 2000);
                     
                 }.bind(this));
@@ -628,10 +686,10 @@
                 const optionsVisible = $('#voiceForm').is(':visible');
                 if (optionsVisible) {
                     $('#voiceForm').slideUp(200);
-                    $(this).html('<i class="fas fa-sliders me-1"></i> Show voice options');
+                    $(this).text('Show voice options');
                 } else {
                     $('#voiceForm').slideDown(200);
-                    $(this).html('<i class="fas fa-sliders me-1"></i> Hide voice options');
+                    $(this).text('Hide voice options');
                 }
             });
             
@@ -656,7 +714,7 @@
                 
                 // Show generating state
                 $('#generateVoiceBtn').prop('disabled', true);
-                $('#generateVoiceBtn').html('<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span> Generating...');
+                $('#generateVoiceBtn').text('Generating...');
                 
                 // Form will submit normally (no preventDefault)
                 // This allows browser to handle redirect properly
