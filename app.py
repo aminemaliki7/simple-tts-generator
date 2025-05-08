@@ -154,7 +154,6 @@ def upload_file():
             f.write(text_content)
     
     # Handle file upload
-    else:
         # ... (existing file upload code)
         if 'script' not in request.files:
             return jsonify({'error': 'No script file provided'}), 400
@@ -833,3 +832,8 @@ The script should feel persuasive and compelling, with a clear focus on how {pro
     
 if __name__ == '__main__':
     app.run(debug=True)
+else:
+    # For production (Render)
+    import os
+    port = int(os.environ.get('PORT', 5000))
+    app.run(host='0.0.0.0', port=port, debug=False)
