@@ -535,37 +535,43 @@
         }
         
         function useScript() {
-            // Get the script text
-            const scriptText = document.getElementById('hidden-script').value;
-            
-            // Get voice settings
-            const voiceId = document.getElementById('voice').value;
-            
-            // Create a form to submit to the voice generator
-            const form = document.createElement('form');
-            form.method = 'POST';
-            form.action = '/upload';
-            
-            // Create hidden fields
-            const fields = {
-                'input-method': 'text',
-                'text-content': scriptText,
-                'voice': voiceId
-            };
-            
-            // Add all fields to form
-            for (const [name, value] of Object.entries(fields)) {
-                const input = document.createElement('input');
-                input.type = 'hidden';
-                input.name = name;
-                input.value = value;
-                form.appendChild(input);
-            }
-            
-            // Add form to body and submit
-            document.body.appendChild(form);
-            form.submit();
-        }
+    // Get the script text
+    const scriptText = document.getElementById('hidden-script').value;
+    
+    // Get voice settings
+    const voiceId = document.getElementById('voice').value;
+    
+    // Get the title (use video title as the title for the voice file)
+    const title = document.getElementById('video-title').value.trim();
+    
+    // Create a form to submit to the voice generator
+    const form = document.createElement('form');
+    form.method = 'POST';
+    form.action = '/upload';
+    
+    // Create hidden fields with all required parameters
+    const fields = {
+        'input-method': 'text',
+        'text-content': scriptText,
+        'voice': voiceId,
+        'speed': 1.0,        // Default speed
+        'depth': 1,         // Default depth
+        'title': title      // Add title field
+    };
+    
+    // Add all fields to form
+    for (const [name, value] of Object.entries(fields)) {
+        const input = document.createElement('input');
+        input.type = 'hidden';
+        input.name = name;
+        input.value = value;
+        form.appendChild(input);
+    }
+    
+    // Add form to body and submit
+    document.body.appendChild(form);
+    form.submit();
+}
         
         // Initialize on page load
         document.addEventListener("DOMContentLoaded", function() {

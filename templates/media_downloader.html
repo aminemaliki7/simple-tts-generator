@@ -76,7 +76,7 @@
             </div>
             
             <!-- Download Status Section - Initially hidden, shown via JS when downloads start -->
-            <div id="download-status" class="download-status">
+            <div id="download-status" class="download-status" style="display: none;">
                 <h5 class="mb-3">Download Status</h5>
                 <div id="downloads-container">
                     <!-- Download items will be added here dynamically -->
@@ -114,6 +114,9 @@
             <p>&copy; 2025 Voice Generator. All rights reserved.</p>
         </div>
     </div>
+    
+    <!-- Add a hidden iframe for download handling -->
+    <iframe id="download-frame" style="display:none;"></iframe>
     
     <!-- Load Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>

@@ -8,6 +8,7 @@ from werkzeug.utils import secure_filename
 import threading
 from datetime import datetime
 from flask import send_file
+from youtube_news_generator import generate_youtube_news_script
 
 import google.generativeai as genai
 from flask import request, jsonify
@@ -15,6 +16,7 @@ from dotenv import load_dotenv
 
 # Import from our modules
 from tts import generate_simple_tts
+from gnews_client import GNewsClient
 
 # Import the downloader modules at the top of your app.py file
 from media_downloaders import download_mp3, download_pinterest_video, check_yt_dlp_installed
@@ -23,6 +25,9 @@ import uuid
 # Initialize Flask app
 app = Flask(__name__)
 app.secret_key = "simple_tts_generator"  # for session management
+
+
+gnews_client = GNewsClient() 
 
 load_dotenv()
 
@@ -830,6 +835,176 @@ The script should feel persuasive and compelling, with a clear focus on how {pro
     except Exception as e:
         print(f"Error generating marketing script: {e}")
         return jsonify({'error': 'Failed to generate script. Please try again later.'}), 500
+    
+
+@app.route('/news')
+def news_page():
+    """Render the news reader page"""
+    # Get the same voice and language data you use for your main page
+    languages = AVAILABLE_LANGUAGES  # Use the existing AVAILABLE_LANGUAGES variable
+    voices = AVAILABLE_VOICES  # Use the existing AVAILABLE_VOICES variable
+    
+    return render_template('news.html', languages=languages, voices=voices)
+
+@app.route('/api/news')
+def get_news():
+    """API endpoint to fetch news from GNews"""
+    # Get query parameters
+    category = request.args.get('category', 'general')
+    language = request.args.get('language', 'en')
+    query = request.args.get('query', '')
+    
+    try:
+        # Use our GNewsClient to fetch news
+        if query:
+            # If there's a search query, use search function
+            results = gnews_client.search_news(query=query, language=language)
+        else:
+            # Otherwise fetch top headlines
+            results = gnews_client.get_top_headlines(category=category, language=language)
+        
+        return jsonify(results)
+    
+    except Exception as e:
+        app.logger.error(f"Error fetching news: {str(e)}")
+        return jsonify({"error": str(e), "articles": []}), 500
+
+@app.route('/api/news/content')
+def get_article_content():
+    """API endpoint to fetch and extract content from a news article"""
+    # Get the article URL
+    url = request.args.get('url', '')
+    
+    if not url:
+        return jsonify({"error": "No URL provided"}), 400
+    
+    try:
+        # Use our GNewsClient to fetch article content
+        result = gnews_client.fetch_article_content(url)
+        
+        # Add a fallback content if extraction failed but we didn't get an exception
+        if not result.get('content') or len(result.get('content', '').strip()) < 100:
+            app.logger.warning(f"Content extraction returned minimal/no content for {url}")
+            result['extraction_error'] = "Could not extract sufficient content from this article"
+            result['content'] = result.get('content', '') or "This article's content couldn't be extracted automatically. Please try visiting the original article."
+        
+        return jsonify(result)
+    except Exception as e:
+        app.logger.error(f"Error fetching article content: {str(e)}")
+        return jsonify({
+            "error": str(e), 
+            "content": "Failed to extract article content. Some websites prevent automatic content extraction.",
+            "url": url
+        }), 200  # Return 200 to handle the error on the client side
+
+
+
+@app.route('/api/news/summary', methods=['POST'])
+def generate_article_summary():
+    """Generate a summary of a news article"""
+    # Get request data
+    data = request.json
+    
+    if not data or 'content' not in data:
+        return jsonify({"error": "No content provided"}), 400
+    
+    try:
+        # Generate summary
+        content = data.get('content', '')
+        title = data.get('title', '')
+        
+        # Placeholder function for generating a news summary
+        def generate_news_summary(content, max_length=2000):
+            return content[:max_length]  # Truncate content to max_length as a simple summary
+
+        summary = generate_news_summary(content, max_length=2000)
+        
+        return jsonify({
+            "summary": summary,
+            "original_length": len(content),
+            "summary_length": len(summary)
+        })
+        
+    except Exception as e:
+        app.logger.error(f"Error generating summary: {str(e)}")
+        return jsonify({"error": str(e)}), 500
+
+
+@app.route('/api/news/voice-optimize', methods=['POST'])
+def optimize_article_for_voice():
+    """Optimize article content for voice narration"""
+    # Get request data
+    data = request.json
+    
+    if not data or 'content' not in data:
+        return jsonify({"error": "No content provided"}), 400
+    
+    try:
+        # Generate voice-optimized content
+        content = data.get('content', '')
+        title = data.get('title', '')
+        
+        # Define a placeholder function for voice optimization
+        def generate_voice_optimized_text(content, word_limit=400):
+            # Truncate content to the word limit as a simple optimization
+            words = content.split()
+            return ' '.join(words[:word_limit])
+        
+        optimized_content = generate_voice_optimized_text(content, word_limit=400)
+        
+        return jsonify({
+            "optimized_content": optimized_content,
+            "original_length": len(content),
+            "optimized_length": len(optimized_content)
+        })
+        
+    except Exception as e:
+        app.logger.error(f"Error optimizing content: {str(e)}")
+        return jsonify({"error": str(e)}), 500
+
+
+@app.route('/api/news/youtube-script', methods=['POST'])
+def generate_news_youtube_script_route():
+    """Generate a YouTube-style news script based on article content"""
+    # Get request data
+    data = request.json
+    
+    if not data or 'content' not in data:
+        return jsonify({"error": "No content provided"}), 400
+    
+    try:
+        # Extract parameters
+        content = data.get('content', '')
+        title = data.get('title', '')
+        source = data.get('source', '')
+        word_limit = data.get('word_limit', 300)
+        
+        # Validate word limit
+        try:
+            word_limit = int(word_limit)
+            if word_limit < 100:
+                word_limit = 100
+            elif word_limit > 500:
+                word_limit = 500
+        except (ValueError, TypeError):
+            word_limit = 300
+        
+        # Generate the YouTube news script
+        result = generate_youtube_news_script(content, title, source, word_limit)
+        
+        return jsonify(result)
+        
+    except Exception as e:
+        app.logger.error(f"Error generating YouTube script: {str(e)}")
+        return jsonify({"error": str(e)}), 500
+        
+    except Exception as e:
+        app.logger.error(f"Error generating YouTube script: {str(e)}")
+        return jsonify({"error": str(e)}), 500
+
+    except Exception as e:
+        app.logger.error(f"Error optimizing content: {str(e)}")
+        return jsonify({"error": str(e)}), 500
     
 if __name__ == '__main__':
     app.run(debug=True)
